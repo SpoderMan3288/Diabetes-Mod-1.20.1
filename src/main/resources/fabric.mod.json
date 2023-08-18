@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "diabetes",
+	"version": "${version}",
+	"name": "Diabetes Mod",
+	"description": "No pancreas?",
+	"authors": [
+		"SockMan3288"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "MIT",
+	"icon": "assets/diabetesmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "net.gartersnake.diabetesmod.DiabetesMod"
+		],
+		"client": [
+          "net.gartersnake.diabetesmod.DiabetesModClient"
+		],
+		"fabric-datagen": [
+			"net.gartersnake.diabetesmod.DiabetesModDataGenerator"
+		]
+	},
+	"mixins": [
+		"diabetesmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.22",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

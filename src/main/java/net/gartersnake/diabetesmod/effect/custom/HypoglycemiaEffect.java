@@ -1,0 +1,43 @@
+package net.gartersnake.diabetesmod.effect.custom;
+
+import net.gartersnake.diabetesmod.damage_type.ModDamageTypes;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectCategory;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
+
+public class HypoglycemiaEffect extends StatusEffect {
+
+    public HypoglycemiaEffect(StatusEffectCategory category, int color) {
+        super(category, color);
+    }
+
+    @Override
+    public void applyUpdateEffect(LivingEntity entity, int amplifier) {
+        if (entity instanceof PlayerEntity) {
+            if (amplifier >= 0) {
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 10, amplifier));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 10, amplifier));
+            }
+            if (amplifier >= 1) {
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 10));
+            }
+            if (amplifier >= 2) {
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 10));
+            }
+            if (amplifier >= 3) {
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 10, 2));
+            }
+            if (amplifier >= 4) {
+                entity.damage(entity.getDamageSources().create(ModDamageTypes.LOW_GLUCOSE), 3);
+            }
+        }
+    }
+
+    @Override
+    public boolean canApplyUpdateEffect(int duration, int amplifier) {
+        return true;
+    }
+}

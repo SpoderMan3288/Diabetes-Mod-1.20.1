@@ -1,0 +1,17 @@
+{
+  "itemgroup.diabetesmod.diabetes": "Diabetes Mod",
+
+  "item.diabetesmod.pancreas": "Pancreas",
+
+  "block.diabetesmod.fermentation_tank": "Fermentation Tank",
+
+  "effect.diabetesmod.hypoglycemia": "Hypoglycemia",
+  "effect.diabetesmod.hyperglycemia": "Hyperglycemia",
+
+  "key.category.diabetesmod.diabetes": "Diabetes Mod",
+  "key.diabetesmod.increase_glucose": "Increase Glucose",
+  "key.diabetesmod.decrease_glucose": "Decrease Glucose",
+
+  "death.attack.lowGlucose": "%1$s's blood sugar went too low",
+  "death.attack.highGlucose": "%1$s's blood sugar went too high"
+}
