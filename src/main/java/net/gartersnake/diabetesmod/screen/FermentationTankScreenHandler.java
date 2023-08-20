@@ -26,7 +26,7 @@ public class FermentationTankScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = delegate;
 
-        this.addSlot(new Slot(inventory, 0, 61, 28));
+        this.addSlot(new Slot(inventory, 0, 62, 29));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);

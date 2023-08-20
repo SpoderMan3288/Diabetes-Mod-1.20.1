@@ -24,7 +24,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
 
     protected final PropertyDelegate propertyDelegate;
     private int progress = 0;
-    private int maxProgress = 0;
+    private int maxProgress = 300;
 
 
     public FermentationTankBlockEntity(BlockPos pos, BlockState state) {

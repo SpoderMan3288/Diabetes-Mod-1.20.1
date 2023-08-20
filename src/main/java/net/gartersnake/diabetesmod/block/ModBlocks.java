@@ -3,6 +3,7 @@ package net.gartersnake.diabetesmod.block;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.gartersnake.diabetesmod.DiabetesMod;
+import net.gartersnake.diabetesmod.block.custom.FermentationTankBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
@@ -30,7 +31,7 @@ public class ModBlocks {
 
     public static void registerModBlocks() {
         FERMENTATION_TANK = registerBlock("fermentation_tank",
-                new Block(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
+                new FermentationTankBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK)));
         DiabetesMod.LOGGER.debug("Registering Mod Blocks for " + DiabetesMod.MOD_ID);
     }
 }

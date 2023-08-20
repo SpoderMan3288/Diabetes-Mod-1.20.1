@@ -34,7 +34,7 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
     }
 
     private void renderProgressArrow(DrawContext context, int x, int y){
-        if(handler.isExtracting()) {
+        if (handler.isExtracting()) {
             context.drawTexture(TEXTURE, x+61, y+55, 176, 0, handler.getScaledProgress(), 8);
         }
     }
