@@ -9,6 +9,7 @@ import net.gartersnake.diabetesmod.block.entity.ModBlockEntities;
 import net.gartersnake.diabetesmod.effect.ModEffects;
 import net.gartersnake.diabetesmod.event.FoodTooltipHandler;
 import net.gartersnake.diabetesmod.event.PlayerTickHandler;
+import net.gartersnake.diabetesmod.fluid.ModFluids;
 import net.gartersnake.diabetesmod.item.ModItemGroups;
 import net.gartersnake.diabetesmod.item.ModItems;
 import net.gartersnake.diabetesmod.networking.ModPackets;
@@ -30,6 +31,7 @@ public class DiabetesMod implements ModInitializer {
 		ModBlockEntities.registerModBlockEntities();
 
 		ModScreenHandlers.registerModScreenHandlers();
+		ModFluids.register();
 
 		ModEffects.registerModEffects();
 		ModPackets.registerC2SPackets();
