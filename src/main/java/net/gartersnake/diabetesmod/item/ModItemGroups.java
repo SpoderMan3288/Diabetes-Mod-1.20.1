@@ -3,6 +3,7 @@ package net.gartersnake.diabetesmod.item;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.gartersnake.diabetesmod.DiabetesMod;
 import net.gartersnake.diabetesmod.block.ModBlocks;
+import net.gartersnake.diabetesmod.fluid.ModFluids;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -19,6 +20,7 @@ public class ModItemGroups {
 
                         entries.add(ModItems.PANCREAS);
                         entries.add(ModBlocks.FERMENTATION_TANK);
+                        entries.add(ModFluids.INSULIN_BUCKET);
 
                     }).build());
 
