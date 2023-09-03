@@ -54,6 +54,39 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
         this.width = width;
         this.height = height;
     }
+    /*
+    public void drawFluid(MatrixStack matrixStack, FluidStack fluid, int x, int y, int width, int height, long maxCapacity) {
+        if (fluid.getFluidVariant().getFluid() == Fluids.EMPTY) {
+            return;
+        }
+        RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
+        y += height;
+        final Sprite sprite = FluidVariantRendering.getSprite(fluid.getFluidVariant());
+        int color = FluidVariantRendering.getColor(fluid.getFluidVariant());
+
+        final int drawHeight = (int) (fluid.getAmount() / (maxCapacity * 1F) * height);
+        final int iconHeight = sprite.getY();
+        int offsetHeight = drawHeight;
+
+        RenderSystem.setShaderColor((color >> 16 & 255) / 255.0F, (float) (color >> 8 & 255) / 255.0F, (float) (color & 255) / 255.0F, 1F);
+
+        int iteration = 0;
+        while (offsetHeight != 0) {
+            final int curHeight = offsetHeight < iconHeight ? offsetHeight : iconHeight;
+
+            DrawableHelper.drawSprite(matrixStack, x, y - offsetHeight, 0, width, curHeight, sprite);
+            offsetHeight -= curHeight;
+            iteration++;
+            if (iteration > 50) {
+                break;
+            }
+        }
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+        RenderSystem.setShaderTexture(0, FluidRenderHandlerRegistry.INSTANCE.get(fluid.getFluidVariant().getFluid())
+                .getFluidSprites(MinecraftClient.getInstance().world, null, fluid.getFluidVariant().getFluid().getDefaultState())[0].getAtlasId());
+    }
+    */
 
     // Method taken from https://github.com/Tiviacz1337/Travelers-Backpack/blob/1.20.1/src/main/java/com/tiviacz/travelersbackpack/util/RenderUtils.java#L34
     public void renderInsulinTank(DrawContext context, FluidStack fluid, long capacity, long amount, double x, double y, double z, double height, double width)
@@ -72,7 +105,8 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
         context.getMatrices().push();
 
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor((color >> 16 & 0xFF) / 255f, (color >> 8 & 0xFF) / 255f, (color & 0xFF) / 255f, 1);
+        RenderSystem.setShaderColor((color >> 16 & 255) / 255.0F, (float) (color >> 8 & 255) / 255.0F, (float) (color & 255) / 255.0F, 1F);
+        //RenderSystem.setShaderColor((color >> 16 & 0xFF) / 255f, (color >> 8 & 0xFF) / 255f, (color & 0xFF) / 255f, 1);
         RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE);
         RenderSystem.disableBlend();
 
@@ -105,6 +139,7 @@ public class FluidStackRenderer implements IIngredientRenderer<FluidStack> {
                 BufferRenderer.drawWithGlobalProgram(builder.end());
             }
         }
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         context.getMatrices().pop();
     }
 
