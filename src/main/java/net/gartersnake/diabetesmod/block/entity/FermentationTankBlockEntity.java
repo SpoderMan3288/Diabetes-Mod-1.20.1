@@ -78,12 +78,12 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
         protected void onFinalCommit() {
             markDirty();
             if (!world.isClient) {
-                sendInsulinPacket();
+                syncInsulinAmount();
             }
         }
     };
 
-    private void sendInsulinPacket() {
+    private void syncInsulinAmount() {
         PacketByteBuf buf = PacketByteBufs.create();
         insulinStorage.variant.toPacket(buf);
         buf.writeLong(insulinStorage.amount);
@@ -113,6 +113,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+        syncInsulinAmount();
         return new FermentationTankScreenHandler(syncId, playerInventory,
                 this, this.propertyDelegate);
     }
