@@ -1,6 +1,7 @@
 package net.gartersnake.diabetesmod.block.entity;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.gartersnake.diabetesmod.DiabetesMod;
 import net.gartersnake.diabetesmod.block.ModBlocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -17,6 +18,8 @@ public class ModBlockEntities {
                 FabricBlockEntityTypeBuilder.create(FermentationTankBlockEntity::new,
                         ModBlocks.FERMENTATION_TANK).build(null));
 
+
+        FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> blockEntity.insulinStorage, FERMENTATION_TANK);
         DiabetesMod.LOGGER.debug("Registering Mod Block Entities for " + DiabetesMod.MOD_ID);
     }
 }

@@ -1,16 +1,24 @@
 package net.gartersnake.diabetesmod.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.gartersnake.diabetesmod.DiabetesMod;
+import net.gartersnake.diabetesmod.screen.renderer.FluidStackRenderer;
+import net.gartersnake.diabetesmod.util.FluidStack;
+import net.gartersnake.diabetesmod.util.MouseUtil;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import java.util.Optional;
+
 public class FermentationTankScreen extends HandledScreen<FermentationTankScreenHandler> {
     public static final Identifier TEXTURE =
             new Identifier(DiabetesMod.MOD_ID, "textures/gui/fermentation_tank_gui.png");
+    private FluidStackRenderer fluidStackRenderer;
 
     public FermentationTankScreen(FermentationTankScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -20,6 +28,12 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
     protected void init() {
         super.init();
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+
+        assignFluidStackRenderer();
+    }
+
+    private void assignFluidStackRenderer() {
+        fluidStackRenderer = new FluidStackRenderer(FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4), true, 15, 53);
     }
 
     @Override
@@ -31,6 +45,26 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
         renderProgressArrow(context, x, y);
+        fluidStackRenderer.drawFluid(context, handler.fluidStack, x + 98, y + 20, 16, 53,
+                FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4));
+    }
+
+    @Override
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        int x = (width - backgroundWidth) / 2;
+        int y = (height - backgroundHeight) / 2;
+        context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0x404040, false);
+        context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, 0x404040, false);
+
+        renderFluidTooltip(context, mouseX, mouseY, x, y, handler.fluidStack, 98, 20, fluidStackRenderer);
+    }
+
+    private void renderFluidTooltip(DrawContext context, int mouseX, int mouseY, int x, int y, FluidStack fluidStack,
+                                    int offsetX, int offsetY, FluidStackRenderer renderer) {
+        if(isMouseAboveArea(mouseX, mouseY, x, y, offsetX, offsetY, renderer)) {
+            context.drawTooltip(textRenderer, renderer.getTooltip(fluidStack, TooltipContext.BASIC),
+                    Optional.empty(), mouseX - x, mouseY - y);
+        }
     }
 
     private void renderProgressArrow(DrawContext context, int x, int y){
@@ -44,5 +78,9 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
         drawMouseoverTooltip(context, mouseX, mouseY);
+    }
+
+    private boolean isMouseAboveArea(int pMouseX, int pMouseY, int x, int y, int offsetX, int offsetY, FluidStackRenderer renderer) {
+        return MouseUtil.isMouseOver(pMouseX, pMouseY, x + offsetX, y + offsetY, renderer.getWidth(), renderer.getHeight());
     }
 }

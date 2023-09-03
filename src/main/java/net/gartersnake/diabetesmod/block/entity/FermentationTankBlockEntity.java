@@ -1,7 +1,18 @@
 package net.gartersnake.diabetesmod.block.entity;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.gartersnake.diabetesmod.fluid.ModFluids;
 import net.gartersnake.diabetesmod.item.ModItems;
+import net.gartersnake.diabetesmod.networking.ModPackets;
 import net.gartersnake.diabetesmod.screen.FermentationTankScreenHandler;
+import net.gartersnake.diabetesmod.util.FluidStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,22 +21,22 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class FermentationTankBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
+public class FermentationTankBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(1, ItemStack.EMPTY);
-
     protected final PropertyDelegate propertyDelegate;
     private int progress = 0;
     private int maxProgress = 300;
-
 
     public FermentationTankBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FERMENTATION_TANK, pos, state);
@@ -51,6 +62,44 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
         };
     }
 
+    // Insulin Storage
+    public final SingleVariantStorage<FluidVariant> insulinStorage = new SingleVariantStorage<FluidVariant>() {
+        @Override
+        protected FluidVariant getBlankVariant() {
+            return FluidVariant.blank();
+        }
+
+        @Override
+        protected long getCapacity(FluidVariant variant) {
+            return FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4);
+        }
+
+        @Override
+        protected void onFinalCommit() {
+            markDirty();
+            if (!world.isClient) {
+                sendInsulinPacket();
+            }
+        }
+    };
+
+    private void sendInsulinPacket() {
+        PacketByteBuf buf = PacketByteBufs.create();
+        insulinStorage.variant.toPacket(buf);
+        buf.writeLong(insulinStorage.amount);
+        buf.writeBlockPos(getPos());
+
+        for (ServerPlayerEntity player : PlayerLookup.tracking((ServerWorld) world, getPos())) {
+            ServerPlayNetworking.send(player, ModPackets.SYNC_INSULIN, buf);
+        }
+    }
+
+    public void setInsulinLevel(FluidVariant fluidVariant, long insulinLevel) {
+        this.insulinStorage.variant = fluidVariant;
+        this.insulinStorage.amount = insulinLevel;
+    }
+
+    // Functionality
     @Override
     public Text getDisplayName() {
         return Text.translatable("inventory.diabetesmod.fermentation_tank");
@@ -69,10 +118,17 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
     }
 
     @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(this.pos);
+    }
+
+    @Override
     protected void writeNbt(NbtCompound nbt) {
         super.writeNbt(nbt);
         Inventories.writeNbt(nbt, inventory);
         nbt.putInt("fermentation_tank.progress", progress);
+        nbt.put("fermentation_tank.variant", insulinStorage.variant.toNbt());
+        nbt.putLong("fermentation_tank.insulin_amount", insulinStorage.amount);
     }
 
     @Override
@@ -80,6 +136,8 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
         Inventories.readNbt(nbt, inventory);
         super.readNbt(nbt);
         progress = nbt.getInt("fermentation_tank.progress");
+        insulinStorage.variant = FluidVariant.fromNbt((NbtCompound)nbt.get("fermentation_tank.variant"));
+        insulinStorage.amount = nbt.getLong("fermentation_tank.insulin_amount");
     }
 
     private void resetProgress() {
@@ -110,7 +168,12 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
         }
 
         if (hasRecipe(entity)) {
-            entity.removeStack(0, 1);
+            try(Transaction transaction = Transaction.openOuter()) {
+                entity.insulinStorage.insert(FluidVariant.of(ModFluids.STILL_INSULIN),
+                        FluidStack.convertDropletsToMb(FluidConstants.BUCKET), transaction);
+                transaction.commit();
+                entity.removeStack(0, 1);
+            }
             entity.resetProgress();
         }
     }
@@ -124,6 +187,9 @@ public class FermentationTankBlockEntity extends BlockEntity implements NamedScr
         boolean hasPancreasInSlot = entity.getStack(0)
                 .getItem() == ModItems.PANCREAS;
 
-        return hasPancreasInSlot;
+        boolean isFull = entity.insulinStorage.amount
+                >= FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4);
+
+        return hasPancreasInSlot && !isFull;
     }
 }

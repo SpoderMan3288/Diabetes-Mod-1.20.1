@@ -1,10 +1,13 @@
 package net.gartersnake.diabetesmod.screen;
 
+import net.gartersnake.diabetesmod.block.entity.FermentationTankBlockEntity;
+import net.gartersnake.diabetesmod.util.FluidStack;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -13,29 +16,36 @@ import net.minecraft.screen.slot.Slot;
 public class FermentationTankScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final PropertyDelegate propertyDelegate;
+    public final FermentationTankBlockEntity blockEntity;
+    public FluidStack fluidStack;
 
-    public FermentationTankScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(1),
+    public FermentationTankScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
+        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()),
                 new ArrayPropertyDelegate(2));
     }
 
-    public FermentationTankScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate) {
+    public FermentationTankScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity entity, PropertyDelegate delegate) {
         super(ModScreenHandlers.FERMENTATION_TANK_SCREEN_HANDLER, syncId);
+        this.inventory = ((Inventory)entity);
         checkSize(inventory, 1);
-        this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = delegate;
+        this.blockEntity = (FermentationTankBlockEntity)entity;
+        this.fluidStack = new FluidStack(blockEntity.insulinStorage.variant, blockEntity.insulinStorage.amount);
 
         this.addSlot(new Slot(inventory, 0, 62, 29));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
-
         addProperties(delegate);
     }
 
     public boolean isExtracting() {
         return propertyDelegate.get(0) > 0;
+    }
+
+    public void setFluid(FluidStack stack) {
+        fluidStack = stack;
     }
 
     public int getScaledProgress() {

@@ -5,8 +5,13 @@
   "item.diabetesmod.insulin_bucket": "Insulin Bucket",
 
   "block.diabetesmod.fermentation_tank": "Fermentation Tank",
+  "block.diabetesmod.insulin": "Insulin",
+  "block.minecraft.empty": "Empty",
 
   "inventory.diabetesmod.fermentation_tank": "Fermentation Tank",
+
+  "diabetesmod.tooltip.insulin_amount_with_capacity": "%s / %s Units",
+  "diabetesmod.tooltip.insulin_amount": "%s Units",
 
   "effect.diabetesmod.hypoglycemia": "Hypoglycemia",
   "effect.diabetesmod.hyperglycemia": "Hyperglycemia",
