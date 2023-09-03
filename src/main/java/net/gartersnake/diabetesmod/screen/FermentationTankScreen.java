@@ -19,6 +19,7 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
     public static final Identifier TEXTURE =
             new Identifier(DiabetesMod.MOD_ID, "textures/gui/fermentation_tank_gui.png");
     private FluidStackRenderer fluidStackRenderer;
+    private final long maxCapacity = FluidConstants.DROPLET * 100;
 
     public FermentationTankScreen(FermentationTankScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -33,7 +34,7 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
     }
 
     private void assignFluidStackRenderer() {
-        fluidStackRenderer = new FluidStackRenderer(FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4), true, 15, 53);
+        fluidStackRenderer = new FluidStackRenderer(maxCapacity, true, 15, 53);
     }
 
     @Override
@@ -45,8 +46,8 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
         renderProgressArrow(context, x, y);
-        fluidStackRenderer.drawFluid(context, handler.fluidStack, x + 98, y + 20, 16, 53,
-                FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4));
+        fluidStackRenderer.renderInsulinTank(context, handler.fluidStack, maxCapacity,
+                handler.fluidStack.amount, x + 98, y + 20, 0, 53, 16);
     }
 
     @Override

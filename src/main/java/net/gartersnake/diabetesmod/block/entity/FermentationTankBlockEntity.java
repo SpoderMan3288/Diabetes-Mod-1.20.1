@@ -37,22 +37,23 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
     protected final PropertyDelegate propertyDelegate;
     private int progress = 0;
     private int maxProgress = 300;
+    private final long maxCapacity = FluidConstants.DROPLET * 100;
 
     public FermentationTankBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FERMENTATION_TANK, pos, state);
         this.propertyDelegate = new PropertyDelegate() {
             public int get(int index) {
-                switch (index) {
-                    case 0: return FermentationTankBlockEntity.this.progress;
-                    case 1: return FermentationTankBlockEntity.this.maxProgress;
-                    default: return 0;
-                }
+                return switch(index) {
+                    case 0 -> FermentationTankBlockEntity.this.progress;
+                    case 1 -> FermentationTankBlockEntity.this.maxProgress;
+                    default -> 0;
+                };
             }
 
             public void set(int index, int value) {
                 switch(index) {
-                    case 0: FermentationTankBlockEntity.this.progress = value; break;
-                    case 1: FermentationTankBlockEntity.this.maxProgress = value; break;
+                    case 0 -> FermentationTankBlockEntity.this.progress = value;
+                    case 1 -> FermentationTankBlockEntity.this.maxProgress = value;
                 }
             }
 
@@ -71,7 +72,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
 
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4);
+            return maxCapacity;
         }
 
         @Override
@@ -171,7 +172,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
         if (hasRecipe(entity)) {
             try(Transaction transaction = Transaction.openOuter()) {
                 entity.insulinStorage.insert(FluidVariant.of(ModFluids.STILL_INSULIN),
-                        FluidStack.convertDropletsToMb(FluidConstants.BUCKET), transaction);
+                        FluidConstants.DROPLET * 20, transaction);
                 transaction.commit();
                 entity.removeStack(0, 1);
             }
@@ -188,8 +189,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
         boolean hasPancreasInSlot = entity.getStack(0)
                 .getItem() == ModItems.PANCREAS;
 
-        boolean isFull = entity.insulinStorage.amount
-                >= FluidStack.convertDropletsToMb(FluidConstants.BUCKET * 4);
+        boolean isFull = entity.insulinStorage.amount >= entity.maxCapacity;
 
         return hasPancreasInSlot && !isFull;
     }
