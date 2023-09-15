@@ -19,8 +19,9 @@ public class ModItemGroups {
                     .icon(() -> new ItemStack(ModItems.PANCREAS)).entries((displayContext, entries) -> {
 
                         entries.add(ModItems.PANCREAS);
-                        entries.add(ModBlocks.FERMENTATION_TANK);
+                        entries.add(ModItems.INSULIN_SYRINGE);
                         entries.add(ModFluids.INSULIN_BUCKET);
+                        entries.add(ModBlocks.FERMENTATION_TANK);
 
                     }).build());
 
