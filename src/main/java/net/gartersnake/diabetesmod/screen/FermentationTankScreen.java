@@ -34,7 +34,7 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
     }
 
     private void assignFluidStackRenderer() {
-        fluidStackRenderer = new FluidStackRenderer(maxCapacity, true, 15, 53);
+        fluidStackRenderer = new FluidStackRenderer(maxCapacity, true, 15, 52);
     }
 
     @Override
@@ -45,9 +45,9 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         int y = (height - backgroundHeight) / 2;
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
-        renderProgressArrow(context, x, y);
+        renderExtractionArrow(context, x, y);
         fluidStackRenderer.renderInsulinTank(context, handler.fluidStack, maxCapacity,
-                handler.fluidStack.amount, x + 98, y + 20, 0, 53, 16);
+                handler.fluidStack.amount, x + 98, y + 19, 0, 52, 16);
     }
 
     @Override
@@ -57,7 +57,8 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0x404040, false);
         context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY, 0x404040, false);
 
-        renderFluidTooltip(context, mouseX, mouseY, x, y, handler.fluidStack, 98, 20, fluidStackRenderer);
+        renderUnitMarkers(context);
+        renderFluidTooltip(context, mouseX, mouseY, x, y, handler.fluidStack, 98, 19, fluidStackRenderer);
     }
 
     private void renderFluidTooltip(DrawContext context, int mouseX, int mouseY, int x, int y, FluidStack fluidStack,
@@ -68,10 +69,14 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         }
     }
 
-    private void renderProgressArrow(DrawContext context, int x, int y){
+    private void renderExtractionArrow(DrawContext context, int x, int y){
         if (handler.isExtracting()) {
-            context.drawTexture(TEXTURE, x+61, y+55, 176, 0, handler.getScaledProgress(), 8);
+            context.drawTexture(TEXTURE, x+80, y+19, 176, 0, handler.getScaledProgress(), 8);
         }
+    }
+
+    private void renderUnitMarkers(DrawContext context){
+        context.drawTexture(TEXTURE, 98, 19, 176, 16, 16, 52);
     }
 
     @Override

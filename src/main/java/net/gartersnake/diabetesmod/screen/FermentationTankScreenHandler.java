@@ -27,13 +27,14 @@ public class FermentationTankScreenHandler extends ScreenHandler {
     public FermentationTankScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity entity, PropertyDelegate delegate) {
         super(ModScreenHandlers.FERMENTATION_TANK_SCREEN_HANDLER, syncId);
         this.inventory = ((Inventory)entity);
-        checkSize(inventory, 1);
+        checkSize(inventory, 2);
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = delegate;
         this.blockEntity = (FermentationTankBlockEntity)entity;
         this.fluidStack = new FluidStack(blockEntity.insulinStorage.variant, blockEntity.insulinStorage.amount);
 
-        this.addSlot(new Slot(inventory, 0, 62, 29));
+        this.addSlot(new Slot(inventory, 0, 62, 19));
+        this.addSlot(new Slot(inventory, 1, 62, 55));
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
@@ -51,7 +52,7 @@ public class FermentationTankScreenHandler extends ScreenHandler {
     public int getScaledProgress() {
         int progress = this.propertyDelegate.get(0);
         int maxProgress = this.propertyDelegate.get(1);
-        int progressArrowSize = 26; // This is the width in pixels of your arrow
+        int progressArrowSize = 16;
 
         return maxProgress != 0 && progress != 0 ? progress * progressArrowSize / maxProgress : 0;
     }
