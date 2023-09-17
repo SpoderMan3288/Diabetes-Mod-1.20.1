@@ -19,7 +19,7 @@ public class ModItems {
 
     public static void registerModItems() {
         PANCREAS = registerItem("pancreas", new Item(new FabricItemSettings()));
-        INSULIN_SYRINGE = registerItem("insulin_syringe", new InsulinSyringeItem(new FabricItemSettings()));
+        INSULIN_SYRINGE = registerItem("insulin_syringe", new InsulinSyringeItem(new FabricItemSettings().maxCount(1)));
         DiabetesMod.LOGGER.debug("Registering Mod Items for " + DiabetesMod.MOD_ID);
     }
 }

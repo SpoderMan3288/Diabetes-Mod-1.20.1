@@ -21,7 +21,7 @@ public class FermentationTankScreenHandler extends ScreenHandler {
 
     public FermentationTankScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()),
-                new ArrayPropertyDelegate(2));
+                new ArrayPropertyDelegate(3));
     }
 
     public FermentationTankScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity entity, PropertyDelegate delegate) {
@@ -43,6 +43,10 @@ public class FermentationTankScreenHandler extends ScreenHandler {
 
     public boolean isExtracting() {
         return propertyDelegate.get(0) > 0;
+    }
+
+    public int operation() {
+        return propertyDelegate.get(2);
     }
 
     public void setFluid(FluidStack stack) {

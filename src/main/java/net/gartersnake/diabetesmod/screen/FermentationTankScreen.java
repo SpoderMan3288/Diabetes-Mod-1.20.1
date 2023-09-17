@@ -45,7 +45,14 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         int y = (height - backgroundHeight) / 2;
         context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
 
-        renderExtractionArrow(context, x, y);
+        if (handler.isExtracting()) {
+            switch (handler.operation()) {
+                case 1 : renderRightArrow(context, x, y); break;
+                case 2 : renderDownArrow(context, x, y); break;
+                case 3 : renderLeftArrow(context, x, y); break;
+            }
+        }
+
         fluidStackRenderer.renderInsulinTank(context, handler.fluidStack, maxCapacity,
                 handler.fluidStack.amount, x + 98, y + 19, 0, 52, 16);
     }
@@ -69,10 +76,16 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
         }
     }
 
-    private void renderExtractionArrow(DrawContext context, int x, int y){
-        if (handler.isExtracting()) {
-            context.drawTexture(TEXTURE, x+80, y+19, 176, 0, handler.getScaledProgress(), 8);
-        }
+    private void renderRightArrow(DrawContext context, int x, int y){
+        context.drawTexture(TEXTURE, x+80, y+19, 176, 0, handler.getScaledProgress(), 8);
+    }
+
+    private void renderLeftArrow(DrawContext context, int x, int y){
+        context.drawTexture(TEXTURE, x+95 - handler.getScaledProgress(), y+64, 191 - handler.getScaledProgress(), 8, handler.getScaledProgress() + 1, 8);
+    }
+
+    private void renderDownArrow(DrawContext context, int x, int y){
+        context.drawTexture(TEXTURE, x+62, y+37, 192, 0, 8, handler.getScaledProgress());
     }
 
     private void renderUnitMarkers(DrawContext context){

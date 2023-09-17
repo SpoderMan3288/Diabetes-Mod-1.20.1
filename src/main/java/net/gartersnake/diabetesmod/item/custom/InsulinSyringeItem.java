@@ -1,13 +1,15 @@
 package net.gartersnake.diabetesmod.item.custom;
 
-import net.gartersnake.diabetesmod.block.ModBlocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.Formatting;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class InsulinSyringeItem extends Item {
     public InsulinSyringeItem(Settings settings) {
@@ -15,22 +17,24 @@ public class InsulinSyringeItem extends Item {
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if (!context.getWorld().isClient()) {
-            BlockPos positionClicked = context.getBlockPos();
-            PlayerEntity player = context.getPlayer();
-            BlockState block = context.getWorld().getBlockState(positionClicked);
+    public ItemStack getDefaultStack() {
+        ItemStack stack = new ItemStack(this);
+        NbtCompound nbt = stack.getOrCreateNbt();
+        nbt.putInt("insulin", 0);
 
-            if (isFermentationTank(block)) {
-                player.sendMessage(Text.literal("Clicked Fermentation Tank"));
-                return ActionResult.SUCCESS;
-            }
-        }
-
-        return ActionResult.PASS;
+        return stack;
     }
 
-    private boolean isFermentationTank(BlockState block) {
-        return block.isOf(ModBlocks.FERMENTATION_TANK);
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        NbtCompound nbt = stack.getOrCreateNbt();
+        int insulin = 0;
+        if (nbt != null) {
+            insulin = nbt.getInt("insulin");
+        } else {
+            nbt.putInt("insulin", 0);
+        }
+
+        tooltip.add(Text.literal("Insulin: " + insulin + " / 40 Units").formatted(Formatting.BLUE));
     }
 }

@@ -12,7 +12,6 @@ import net.gartersnake.diabetesmod.fluid.ModFluids;
 import net.gartersnake.diabetesmod.item.ModItems;
 import net.gartersnake.diabetesmod.networking.ModPackets;
 import net.gartersnake.diabetesmod.screen.FermentationTankScreenHandler;
-import net.gartersnake.diabetesmod.util.FluidStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,7 +35,8 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(2, ItemStack.EMPTY);
     protected final PropertyDelegate propertyDelegate;
     private int progress = 0;
-    private int maxProgress = 300;
+    private int maxProgress = 150;
+    private int currentOperation = 0;
     private final long maxCapacity = FluidConstants.DROPLET * 100;
 
     public FermentationTankBlockEntity(BlockPos pos, BlockState state) {
@@ -46,6 +46,7 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
                 return switch(index) {
                     case 0 -> FermentationTankBlockEntity.this.progress;
                     case 1 -> FermentationTankBlockEntity.this.maxProgress;
+                    case 2 -> FermentationTankBlockEntity.this.currentOperation;
                     default -> 0;
                 };
             }
@@ -54,11 +55,12 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
                 switch(index) {
                     case 0 -> FermentationTankBlockEntity.this.progress = value;
                     case 1 -> FermentationTankBlockEntity.this.maxProgress = value;
+                    case 2 -> FermentationTankBlockEntity.this.currentOperation = value;
                 }
             }
 
             public int size() {
-                return 2;
+                return 3;
             }
         };
     }
@@ -151,46 +153,103 @@ public class FermentationTankBlockEntity extends BlockEntity implements Extended
             return;
         }
 
-        if (hasRecipe(entity)) {
+        entity.currentOperation = recipe(entity);
+
+        if (recipe(entity) > 0) {
             entity.progress++;
             markDirty(world, blockPos, state);
             if (entity.progress >= entity.maxProgress) {
-                extractInsulin(entity);
+                switch (recipe(entity)) {
+                    case 1 : extractToTank(entity); break;
+                    case 2 : extractToSyringeFromPancreas(entity); break;
+                    case 3 : extractToSyringeFromTank(entity); break;
+                    default : entity.resetProgress(); break;
+                }
             }
         } else {
             entity.resetProgress();
-            markDirty(world, blockPos, state);
         }
     }
 
-    private static void extractInsulin(FermentationTankBlockEntity entity) {
+    private static void extractToTank(FermentationTankBlockEntity entity) {
         SimpleInventory inventory = new SimpleInventory(entity.size());
         for (int i = 0; i < entity.size(); i++) {
             inventory.setStack(i, entity.getStack(i));
         }
 
-        if (hasRecipe(entity)) {
-            try(Transaction transaction = Transaction.openOuter()) {
-                entity.insulinStorage.insert(FluidVariant.of(ModFluids.STILL_INSULIN),
-                        FluidConstants.DROPLET * 20, transaction);
-                transaction.commit();
-                entity.removeStack(0, 1);
-            }
-            entity.resetProgress();
+        try(Transaction transaction = Transaction.openOuter()) {
+            entity.insulinStorage.insert(FluidVariant.of(ModFluids.STILL_INSULIN),
+                    FluidConstants.DROPLET * 20, transaction);
+            transaction.commit();
+            entity.removeStack(0, 1);
         }
+        entity.resetProgress();
     }
 
-    private static boolean hasRecipe(FermentationTankBlockEntity entity) {
+    private static void extractToSyringeFromPancreas(FermentationTankBlockEntity entity) {
         SimpleInventory inventory = new SimpleInventory(entity.size());
         for (int i = 0; i < entity.size(); i++) {
             inventory.setStack(i, entity.getStack(i));
         }
 
-        boolean hasPancreasInSlot = entity.getStack(0)
-                .getItem() == ModItems.PANCREAS;
+        fillSyringe(entity, 20);
+        entity.removeStack(0, 1);
+        entity.resetProgress();
+    }
 
+    private static void extractToSyringeFromTank(FermentationTankBlockEntity entity) {
+        SimpleInventory inventory = new SimpleInventory(entity.size());
+        for (int i = 0; i < entity.size(); i++) {
+            inventory.setStack(i, entity.getStack(i));
+        }
+
+        try(Transaction transaction = Transaction.openOuter()) {
+            entity.insulinStorage.extract(FluidVariant.of(ModFluids.STILL_INSULIN),
+                    FluidConstants.DROPLET * 20, transaction);
+            transaction.commit();
+            fillSyringe(entity, 20);
+        }
+        entity.resetProgress();
+    }
+
+    private static void fillSyringe(FermentationTankBlockEntity entity, int amount) {
+        ItemStack stack = entity.getStack(1);
+        NbtCompound nbt = stack.getOrCreateNbt();
+        int currentInsulin = nbt.getInt("insulin");
+
+        nbt.putInt("insulin", currentInsulin + amount);
+        stack.writeNbt(nbt);
+    }
+
+    private static int recipe(FermentationTankBlockEntity entity) {
         boolean isFull = entity.insulinStorage.amount >= entity.maxCapacity;
+        boolean isEmpty = entity.insulinStorage.amount <= 0L;
 
-        return hasPancreasInSlot && !isFull;
+        if (pancreasInSlot1(entity) && !syringeInSlot2(entity) && !isFull) {
+            return 1;
+        } else if (pancreasInSlot1(entity) && syringeInSlot2(entity)) {
+            return 2;
+        } else if (!pancreasInSlot1(entity) && syringeInSlot2(entity) && !isEmpty) {
+            return 3;
+        }
+        return 0;
+    }
+
+    private static boolean pancreasInSlot1(FermentationTankBlockEntity entity) {
+        SimpleInventory inventory = new SimpleInventory(entity.size());
+        for (int i = 0; i < entity.size(); i++) {
+            inventory.setStack(i, entity.getStack(i));
+        }
+
+        return entity.getStack(0).getItem() == ModItems.PANCREAS;
+    }
+
+    private static boolean syringeInSlot2(FermentationTankBlockEntity entity) {
+        SimpleInventory inventory = new SimpleInventory(entity.size());
+        for (int i = 0; i < entity.size(); i++) {
+            inventory.setStack(i, entity.getStack(i));
+        }
+
+        return entity.getStack(1).getItem() == ModItems.INSULIN_SYRINGE;
     }
 }
