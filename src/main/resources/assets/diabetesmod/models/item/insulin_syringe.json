@@ -1,6 +1,20 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "item/generated",
   "textures": {
-    "layer0": "diabetesmod:item/placeholder"
-  }
+    "layer0": "diabetesmod:item/insulin_syringe"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "diabetesmod:insulin": 0.5
+      },
+      "model": "diabetesmod:item/insulin_syringe_half"
+    },
+    {
+      "predicate": {
+        "diabetesmod:insulin": 1
+      },
+      "model": "diabetesmod:item/insulin_syringe_full"
+    }
+  ]
 }
