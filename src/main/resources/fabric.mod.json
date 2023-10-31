@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "diabetes",
+	"id": "carbcraft",
 	"version": "${version}",
-	"name": "Diabetes Mod",
+	"name": "CarbCraft",
 	"description": "No pancreas?",
 	"authors": [
 		"SockMan3288"
@@ -12,21 +12,21 @@
 		"sources": ""
 	},
 	"license": "MIT",
-	"icon": "assets/diabetesmod/icon.png",
+	"icon": "assets/carbcraft/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "net.gartersnake.diabetesmod.DiabetesMod"
+			"net.gartersnake.carbcraft.CarbCraft"
 		],
 		"client": [
-          "net.gartersnake.diabetesmod.DiabetesModClient"
+			"net.gartersnake.carbcraft.CarbCraftClient"
 		],
 		"fabric-datagen": [
-			"net.gartersnake.diabetesmod.DiabetesModDataGenerator"
+			"net.gartersnake.carbcraft.CarbCraftDataGenerator"
 		]
 	},
 	"mixins": [
-		"diabetesmod.mixins.json"
+		"carbcraft.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.22",

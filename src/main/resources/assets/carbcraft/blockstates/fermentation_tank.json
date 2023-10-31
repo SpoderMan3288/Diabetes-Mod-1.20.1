@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "carbcraft:block/fermentation_tank"
+    }
+  }
+}

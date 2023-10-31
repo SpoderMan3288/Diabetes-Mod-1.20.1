@@ -1,0 +1,20 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "carbcraft:item/insulin_syringe"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "carbcraft:insulin": 0.5
+      },
+      "model": "carbcraft:item/insulin_syringe_half"
+    },
+    {
+      "predicate": {
+        "carbcraft:insulin": 1
+      },
+      "model": "carbcraft:item/insulin_syringe_full"
+    }
+  ]
+}

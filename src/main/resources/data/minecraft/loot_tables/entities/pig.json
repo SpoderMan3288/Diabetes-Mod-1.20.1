@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "diabetesmod:pancreas",
+          "name": "carbcraft:pancreas",
           "conditions": [
             {
               "condition": "minecraft:random_chance",

@@ -1,0 +1,26 @@
+{
+  "itemgroup.carbcraft.diabetes": "CarbCraft",
+
+  "item.carbcraft.pancreas": "Pancreas",
+  "item.carbcraft.insulin_syringe": "Insulin Syringe",
+  "item.carbcraft.insulin_bucket": "Insulin Bucket",
+
+  "block.carbcraft.fermentation_tank": "Fermentation Tank",
+  "block.carbcraft.insulin": "Insulin",
+  "block.minecraft.empty": "Empty",
+
+  "inventory.carbcraft.fermentation_tank": "Fermentation Tank",
+
+  "carbcraft.tooltip.insulin_amount_with_capacity": "%s / %s Units",
+  "carbcraft.tooltip.insulin_amount": "%s Units",
+
+  "effect.carbcraft.hypoglycemia": "Hypoglycemia",
+  "effect.carbcraft.hyperglycemia": "Hyperglycemia",
+
+  "key.category.carbcraft.diabetes": "CarbCraft",
+  "key.carbcraft.increase_glucose": "Increase Glucose",
+  "key.carbcraft.decrease_glucose": "Decrease Glucose",
+
+  "death.attack.lowGlucose": "%1$s's blood sugar went too low",
+  "death.attack.highGlucose": "%1$s's blood sugar went too high"
+}

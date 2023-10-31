@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "carbcraft:item/insulin_syringe_full"
+  }
+}
