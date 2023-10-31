@@ -47,15 +47,19 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
 
         if (handler.isExtracting()) {
             switch (handler.operation()) {
-                case 1 : renderRightArrow(context, x, y); break;
+                case 1 : renderRightArrow(context, x, y); renderSyringeSlot(context, x, y); break;
                 case 2 : renderDownArrow(context, x, y); break;
                 case 3 : renderLeftArrow(context, x, y); break;
             }
+        } else {
+            renderSyringeSlot(context, x, y);
         }
 
         fluidStackRenderer.renderInsulinTank(context, handler.fluidStack, maxCapacity,
                 handler.fluidStack.amount, x + 98, y + 19, 0, 52, 16);
     }
+
+
 
     @Override
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
@@ -86,6 +90,10 @@ public class FermentationTankScreen extends HandledScreen<FermentationTankScreen
 
     private void renderDownArrow(DrawContext context, int x, int y){
         context.drawTexture(TEXTURE, x+62, y+37, 192, 0, 8, handler.getScaledProgress());
+    }
+
+    private void renderSyringeSlot(DrawContext context, int x, int y) {
+        context.drawTexture(TEXTURE, x+62, y+55, 192, 16, 16, 16);
     }
 
     private void renderUnitMarkers(DrawContext context){
